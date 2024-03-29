@@ -1,0 +1,19 @@
+require:
+  - rubocop-rspec
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 3.3.0
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/seeds.rb'
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Rails/InverseOf:
+  Enabled: false
+  
