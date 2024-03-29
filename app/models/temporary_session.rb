@@ -8,6 +8,6 @@ class TemporarySession < ApplicationRecord
   private
 
   def generate_uuid
-    self.uuid = UUIDTools::UUID.timestamp_create
+    self.uuid = UUIDTools::UUID.timestamp_create if uuid.blank?
   end
 end
