@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_29_040934) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_29_054710) do
+  create_table "registered_urls", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "uuid", null: false
+    t.string "url", null: false
+    t.boolean "active", null: false
+    t.decimal "expires_at", precision: 10, null: false
+    t.bigint "temporary_session_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["temporary_session_id"], name: "index_registered_urls_on_temporary_session_id"
+    t.index ["uuid"], name: "index_registered_urls_on_uuid", unique: true
+  end
+
   create_table "temporary_sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid", null: false
     t.datetime "created_at", null: false
@@ -18,4 +30,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_29_040934) do
     t.index ["uuid"], name: "index_temporary_sessions_on_uuid", unique: true
   end
 
+  add_foreign_key "registered_urls", "temporary_sessions"
 end

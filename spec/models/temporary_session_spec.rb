@@ -9,4 +9,8 @@ RSpec.describe TemporarySession, type: :model do
       end
     end
   end
+
+  describe 'associations' do
+    it { is_expected.to have_many(:registered_urls).dependent(:nullify) }
+  end
 end

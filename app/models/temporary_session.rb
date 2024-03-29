@@ -3,6 +3,8 @@ class TemporarySession < ApplicationRecord
 
   validates :uuid, presence: true, uniqueness: true
 
+  has_many :registered_urls, dependent: :nullify
+
   private
 
   def generate_uuid
