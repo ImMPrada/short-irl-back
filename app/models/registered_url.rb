@@ -9,6 +9,7 @@ class RegisteredUrl < ApplicationRecord
   validates :active, inclusion: { in: [true, false] }
 
   belongs_to :temporary_session, optional: true
+  has_many :url_visits, dependent: :destroy
 
   private
 
