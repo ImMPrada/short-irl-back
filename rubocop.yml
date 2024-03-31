@@ -16,4 +16,6 @@ Style/FrozenStringLiteralComment:
 
 Rails/InverseOf:
   Enabled: false
-  
+
+RSpec/AnyInstance:
+  Enabled: false
