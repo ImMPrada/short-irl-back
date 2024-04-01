@@ -17,6 +17,13 @@ RSpec.describe Api::V1::RegisteredUrlsController, type: :controller do
         expect(response).to have_http_status(:unauthorized)
       end
     end
+
+    describe 'DELETE #destroy' do
+      it 'returns unauthorized status' do
+        delete :destroy, params: { id: 'uuid' }, format: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe 'when token is invalid' do
@@ -37,6 +44,13 @@ RSpec.describe Api::V1::RegisteredUrlsController, type: :controller do
         expect(response).to have_http_status(:unauthorized)
       end
     end
+
+    describe 'DELETE #destroy' do
+      it 'returns unauthorized status' do
+        delete :destroy, params: { id: 'uuid' }, format: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe 'when token is valid' do
@@ -54,6 +68,15 @@ RSpec.describe Api::V1::RegisteredUrlsController, type: :controller do
     describe 'POST #create' do
       it 'returns success status' do
         post :create, params: { 'registered-url': { url: Faker::Internet.url } }, format: :json
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    describe 'DELETE #destroy' do
+      let(:registered_url) { create(:registered_url, temporary_session: temporary_session) }
+
+      it 'returns success status' do
+        delete :destroy, params: { id: registered_url.uuid }, format: :json
         expect(response).to have_http_status(:ok)
       end
     end
@@ -117,6 +140,43 @@ RSpec.describe Api::V1::RegisteredUrlsController, type: :controller do
 
       it 'returns the errors' do
         post :create, params:, format: :json
+        expect(JSON.parse(response.body)).to include('errors')
+      end
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    let(:registered_url) { create(:registered_url, temporary_session:) }
+
+    before do
+      request.headers['Authorization'] = "Token #{temporary_session.uuid}"
+    end
+
+    describe 'when registered URL is found' do
+      it 'returns ok status' do
+        delete :destroy, params: { id: registered_url.uuid }, format: :json
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'renders expected template' do
+        delete :destroy, params: { id: registered_url.uuid }, format: :json
+        expect(response).to render_template(:destroy)
+      end
+
+      it 'deactivates the registered URL' do
+        delete :destroy, params: { id: registered_url.uuid }, format: :json
+        expect(registered_url.reload.active).to be(false)
+      end
+    end
+
+    describe 'when registered URL is not found' do
+      it 'returns not found status' do
+        delete :destroy, params: { id: 'uuid' }, format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns the error message' do
+        delete :destroy, params: { id: 'uuid' }, format: :json
         expect(JSON.parse(response.body)).to include('errors')
       end
     end

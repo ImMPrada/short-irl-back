@@ -15,6 +15,20 @@ module Api
         @registered_url.save!
       end
 
+      def destroy
+        @registered_url = session.registered_urls.find_by(uuid: params[:id])
+        return render json: { errors: 'registered url not found' }, status: :not_found unless @registered_url
+
+        @registered_url.active = false
+        @registered_url.expires_at = Time.zone.now
+
+        unless @registered_url.valid?
+          return render json: { errors: @registered_url.errors }, status: :unprocessable_entity
+        end
+
+        @registered_url.save!
+      end
+
       private
 
       def registered_url_params
