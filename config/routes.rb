@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       post 'temporary-session' => 'temporary_session#create'
+      resources :registered_urls, path: 'registered-urls', only: %i[create index destroy]
     end
   end
 
