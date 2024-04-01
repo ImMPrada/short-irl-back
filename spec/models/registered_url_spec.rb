@@ -41,4 +41,28 @@ RSpec.describe RegisteredUrl, type: :model do
       expect(registered_url.url_visits_count).to eq(10)
     end
   end
+
+  describe '#active' do
+    before do
+      create(:registered_url, active: true)
+      create(:registered_url, active: true)
+      create(:registered_url, active: false)
+    end
+
+    it 'returns only active registered URLs' do
+      expect(described_class.active.count).to eq(2)
+    end
+  end
+
+  describe '#not_expired' do
+    before do
+      create(:registered_url, expires_at: 32.days.ago)
+      create(:registered_url, expires_at: 1.day.from_now)
+      create(:registered_url, expires_at: 1.day.from_now)
+    end
+
+    it 'returns only registered URLs that have not expired' do
+      expect(described_class.not_expired.count).to eq(2)
+    end
+  end
 end
