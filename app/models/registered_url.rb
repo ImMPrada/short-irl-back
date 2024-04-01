@@ -3,7 +3,7 @@ class RegisteredUrl < ApplicationRecord
 
   DEFAULT_EXPIRATION = 1.month
 
-  validates :url, presence: true
+  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp }
   validates :uuid, presence: true, uniqueness: true
   validates :active, inclusion: { in: [true, false] }
 

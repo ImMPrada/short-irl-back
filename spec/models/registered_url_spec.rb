@@ -6,6 +6,17 @@ RSpec.describe RegisteredUrl, type: :model do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:url) }
 
+    describe 'when validating the URL format' do
+      it 'validates the URL format' do
+        expect(registered_url).to be_valid
+      end
+
+      it 'throws an error if URL is not valid' do
+        registered_url.url = 'invalid-url'
+        expect(registered_url).not_to be_valid
+      end
+    end
+
     describe 'when creating a new RegisteredUrl' do
       it 'adds a UUID to the record' do
         expect(registered_url.uuid).to be_present

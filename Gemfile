@@ -43,12 +43,12 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'guard-rspec'
+  gem 'rails-controller-testing'
   gem 'rspec-rails'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'simplecov'
-  gem 'rails-controller-testing'
 end
 
 group :development do
