@@ -1,6 +1,5 @@
 class RegisteredUrl < ApplicationRecord
   before_validation :generate_fields, on: :create
-  after_commit :add_expiration_date, on: :create
 
   DEFAULT_EXPIRATION = 1.month
 
@@ -19,11 +18,6 @@ class RegisteredUrl < ApplicationRecord
   def generate_fields
     self.uuid = SecureRandom.hex(3) if uuid.blank?
     self.active = true if active.nil?
-  end
-
-  def add_expiration_date
-    return if expires_at.present?
-
-    update(expires_at: DEFAULT_EXPIRATION.from_now)
+    self.expires_at = DEFAULT_EXPIRATION.from_now if expires_at.blank?
   end
 end
