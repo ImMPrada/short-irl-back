@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_29_131552) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_01_163208) do
   create_table "registered_urls", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid", null: false
     t.string "url", null: false
     t.boolean "active", null: false
-    t.decimal "expires_at", precision: 10, null: false
+    t.timestamp "expires_at", null: false
     t.bigint "temporary_session_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
