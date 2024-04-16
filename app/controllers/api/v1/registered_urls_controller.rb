@@ -32,7 +32,7 @@ module Api
       private
 
       def registered_url_params
-        params.require(:'registered-url').permit(:url)
+        params.require(:registered_url).permit(:url)
       end
     end
   end

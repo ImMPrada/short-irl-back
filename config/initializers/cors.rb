@@ -7,7 +7,11 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV['CORS_ORIGIN'] || 'http://localhost:5173'
+    if Rails.env.development? || Rails.env.test?
+      origins 'http://localhost:5173'
+    else
+      origins 'https://url-shortener-beta-ten.vercel.app'
+    end
 
     resource "*",
       headers: :any,
