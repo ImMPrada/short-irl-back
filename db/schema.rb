@@ -11,11 +11,14 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.1].define(version: 2024_04_01_163208) do
-  create_table "registered_urls", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  create_table "registered_urls", force: :cascade do |t|
     t.string "uuid", null: false
     t.string "url", null: false
     t.boolean "active", null: false
-    t.timestamp "expires_at", null: false
+    t.string "expires_at", null: false
     t.bigint "temporary_session_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -24,14 +27,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_01_163208) do
     t.index ["uuid"], name: "index_registered_urls_on_uuid", unique: true
   end
 
-  create_table "temporary_sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "temporary_sessions", force: :cascade do |t|
     t.string "uuid", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["uuid"], name: "index_temporary_sessions_on_uuid", unique: true
   end
 
-  create_table "url_visits", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "url_visits", force: :cascade do |t|
     t.bigint "registered_url_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
