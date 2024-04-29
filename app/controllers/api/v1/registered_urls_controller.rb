@@ -6,10 +6,15 @@ module Api
       end
 
       def create
+        token_urls_count = session.registered_urls.active.count
+        if token_urls_count >= RegisteredUrl::MAX_TEMPORARY_SESSION_URLS
+          return render json: { errors: ['maximum number of registered urls reached'] }, status: :unprocessable_entity
+        end
+
         @registered_url = session.registered_urls.new(registered_url_params)
 
         unless @registered_url.valid?
-          return render json: { errors: @registered_url.errors }, status: :unprocessable_entity
+          return render json: { errors: @registered_url.errors.full_messages }, status: :unprocessable_entity
         end
 
         @registered_url.save!

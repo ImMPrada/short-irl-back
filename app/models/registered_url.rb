@@ -2,6 +2,7 @@ class RegisteredUrl < ApplicationRecord
   before_validation :generate_fields, on: :create
 
   DEFAULT_EXPIRATION = 1.month
+  MAX_TEMPORARY_SESSION_URLS = 10
 
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp }
   validates :uuid, presence: true, uniqueness: true
