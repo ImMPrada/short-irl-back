@@ -1,7 +1,7 @@
 module Api
   module V1
     class ProtectedApplicationController < ApplicationController
-      before_action :authenticate_request
+      before_action :authenticate_request, only: %i[index create destroy]
 
       private
 

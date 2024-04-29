@@ -5,6 +5,15 @@ module Api
         @registered_urls = session.registered_urls.active.not_expired
       end
 
+      def show
+        @registered_url = RegisteredUrl.find_by(uuid: params[:id])
+
+        return render json: { errors: 'registered url not found' }, status: :not_found if @registered_url.nil?
+
+        @registered_url.url_visits.create!
+        render :show
+      end
+
       def create
         token_urls_count = session.registered_urls.active.count
         if token_urls_count >= RegisteredUrl::MAX_TEMPORARY_SESSION_URLS
