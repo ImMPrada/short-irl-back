@@ -1,6 +1,8 @@
 module Api
   module V1
     class RegisteredUrlsController < ProtectedApplicationController
+      skip_before_action :authenticate_request, only: [:show]
+
       def index
         @registered_urls = session.registered_urls.active.not_expired
       end
