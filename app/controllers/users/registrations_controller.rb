@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class Users::RegistrationsController < Devise::RegistrationsController
-  # before_action :configure_sign_up_params, only: [:create]
-  # before_action :configure_account_update_params, only: [:update]
+  before_action :configure_sign_up_params, only: [:create]
+  before_action :configure_account_update_params, only: [:update]
+
   include RackSessionsFix
+  include ActionController::Cookies
 
   respond_to :json
 
@@ -44,29 +46,44 @@ class Users::RegistrationsController < Devise::RegistrationsController
   private
 
   def respond_with(current_user, _opts = {})
-    if resource.persisted?
-      render json: {
-        status: {code: 200, message: 'Signed up successfully.'},
-        data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
+    return build_failed_response unless current_user.persisted?
+
+    @token = request.env['warden-jwt_auth.token']
+    build_success_response
+  end
+
+  def build_success_response
+    cookies.signed[:shorter] = {
+      value: @token,
+      httponly: true,
+      secure: Rails.env.production?,
+      same_site: true
+    }
+
+    render json: {
+      status: { code: 200, message: 'Signed up successfully.' },
+      data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
+    }
+  end
+
+  def build_failed_response
+    render json: {
+      status: {
+        message: "User couldn't be created.",
+        errors: current_user.errors
       }
-    else
-      render json: {
-        status: {message: "User couldn't be created successfully. #{current_user.errors.full_messages.to_sentence}"}
-      }, status: :unprocessable_entity
-    end
+    }, status: :unprocessable_entity
   end
 
   # protected
 
-  # If you have extra params to permit, append them to the sanitizer.
-  # def configure_sign_up_params
-  #   devise_parameter_sanitizer.permit(:sign_up, keys: [:attribute])
-  # end
+  def configure_sign_up_params
+    devise_parameter_sanitizer.permit(:sign_up, keys: %i[username])
+  end
 
-  # If you have extra params to permit, append them to the sanitizer.
-  # def configure_account_update_params
-  #   devise_parameter_sanitizer.permit(:account_update, keys: [:attribute])
-  # end
+  def configure_account_update_params
+    devise_parameter_sanitizer.permit(:account_update, keys: %i[username])
+  end
 
   # The path used after sign up.
   # def after_sign_up_path_for(resource)

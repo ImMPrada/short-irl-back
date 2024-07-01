@@ -6,7 +6,7 @@ module Api
       private
 
       def authenticate_request
-        return if token && session
+        return if token || temporary_session
 
         render json: { error: 'Unauthorized' }, status: :unauthorized
       end
@@ -15,8 +15,8 @@ module Api
         @token ||= request.headers['Authorization']&.split(' ')&.last
       end
 
-      def session
-        @session ||= TemporarySession.find_by(uuid: token)
+      def temporary_session
+        @temporary_session ||= TemporarySession.find_by(uuid: token)
       end
     end
   end
