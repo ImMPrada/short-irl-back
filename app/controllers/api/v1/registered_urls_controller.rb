@@ -4,7 +4,9 @@ module Api
       skip_before_action :authenticate_request, only: [:show]
 
       def index
-        @registered_urls = session.registered_urls.active.not_expired
+        @registered_urls = []
+        @registered_urls = temporary_session.registered_urls.active.not_expired unless temporary_session_token.nil?
+        @registered_urls = current_user.registered_urls.active.not_expired unless token.nil?
       end
 
       def show
@@ -17,12 +19,12 @@ module Api
       end
 
       def create
-        token_urls_count = session.registered_urls.active.count
+        token_urls_count = temporary_session.registered_urls.active.count
         if token_urls_count >= RegisteredUrl::MAX_TEMPORARY_SESSION_URLS
           return render json: { errors: ['maximum number of registered urls reached'] }, status: :unprocessable_entity
         end
 
-        @registered_url = session.registered_urls.new(registered_url_params)
+        @registered_url = temporary_session.registered_urls.new(registered_url_params)
 
         unless @registered_url.valid?
           return render json: { errors: @registered_url.errors.full_messages }, status: :unprocessable_entity
@@ -32,7 +34,7 @@ module Api
       end
 
       def destroy
-        @registered_url = session.registered_urls.find_by(uuid: params[:id])
+        @registered_url = temporary_session.registered_urls.find_by(uuid: params[:id])
         return render json: { errors: 'registered url not found' }, status: :not_found unless @registered_url
 
         @registered_url.active = false
