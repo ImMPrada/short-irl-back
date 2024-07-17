@@ -8,6 +8,7 @@ class RegisteredUrl < ApplicationRecord
   validates :uuid, presence: true, uniqueness: true
   validates :active, inclusion: { in: [true, false] }
 
+  belongs_to :user, optional: true
   belongs_to :temporary_session, optional: true
   has_many :url_visits, dependent: :destroy
 

@@ -16,7 +16,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # POST /resource
   # def create
-    # super
+  #   super
   # end
 
   # GET /resource/edit
@@ -48,15 +48,15 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def respond_with(current_user, _opts = {})
     return build_failed_response unless current_user.persisted?
 
-    @token = request.env['warden-jwt_auth.token']
-    build_success_response
+    token = request.env['warden-jwt_auth.token']
+    build_success_response(token)
   end
 
-  def build_success_response
-    cookies.signed[:shorter] = {
-      value: @token,
+  def build_success_response(token)
+    cookies[:shorter] = {
+      value: token,
       httponly: true,
-      secure: Rails.env.production?,
+      secure: true,
       same_site: true
     }
 
@@ -70,7 +70,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     render json: {
       status: {
         message: "User couldn't be created.",
-        errors: current_user.errors
+        errors: current_user ? current_user.errors : 'Unauthorized'
       }
     }, status: :unprocessable_entity
   end
@@ -86,9 +86,19 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   # The path used after sign up.
-  # def after_sign_up_path_for(resource)
-  #   super(resource)
-  # end
+  def after_sign_up_path_for(resource)
+    super(resource)
+
+    temporary_session_token = request.headers['Authorization']&.split(' ')&.last
+    return unless temporary_session_token
+
+    temporary_session = TemporarySession.find_by(uuid: temporary_session_token)
+    registered_urls = temporary_session.registered_urls
+    resource.registered_urls = registered_urls
+
+    resource.save
+    temporary_session.destroy
+  end
 
   # The path used after sign up for inactive accounts.
   # def after_inactive_sign_up_path_for(resource)
