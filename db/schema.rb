@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_29_171025) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_01_165410) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,11 +19,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_29_171025) do
     t.string "url", null: false
     t.boolean "active", null: false
     t.string "expires_at", null: false
-    t.bigint "temporary_session_id", null: false
+    t.bigint "temporary_session_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "url_visits_count"
+    t.bigint "user_id"
     t.index ["temporary_session_id"], name: "index_registered_urls_on_temporary_session_id"
+    t.index ["user_id"], name: "index_registered_urls_on_user_id"
     t.index ["uuid"], name: "index_registered_urls_on_uuid", unique: true
   end
 
@@ -57,5 +59,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_29_171025) do
   end
 
   add_foreign_key "registered_urls", "temporary_sessions"
+  add_foreign_key "registered_urls", "users"
   add_foreign_key "url_visits", "registered_urls"
 end

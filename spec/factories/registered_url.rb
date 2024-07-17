@@ -4,5 +4,6 @@ FactoryBot.define do
     active { true }
     expires_at { Time.zone.now + 30.days }
     temporary_session
+    user
   end
 end

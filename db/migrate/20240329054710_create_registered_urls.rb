@@ -6,7 +6,7 @@ class CreateRegisteredUrls < ActiveRecord::Migration[7.1]
       t.boolean :active, null: false
       t.numeric :expires_at, null: false
 
-      t.references :temporary_session, null: false, foreign_key: true
+      t.references :temporary_session, null: true, foreign_key: true
 
       t.timestamps
     end
