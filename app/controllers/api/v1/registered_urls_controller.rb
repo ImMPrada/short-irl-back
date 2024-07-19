@@ -5,8 +5,8 @@ module Api
 
       def index
         @registered_urls = []
-        @registered_urls = temporary_session.registered_urls.active.not_expired unless temporary_session_token.nil?
-        @registered_urls = current_user.registered_urls.active.not_expired unless token.nil?
+        @registered_urls = temporary_session.registered_urls.active.not_expired unless temporary_session.nil?
+        @registered_urls = current_user.registered_urls.active.not_expired unless current_user.nil?
       end
 
       def show
@@ -20,27 +20,26 @@ module Api
 
       def create
         url = registered_url_params[:url]
+        creator = RegisteredUrls::Creator.new
+
         unless temporary_session_token.nil?
-          @registered_url = RegisteredUrls::Creator.new.create_for_temporary_session(temporary_session:,
-                                                                                     url:)
+          @registered_url = creator.create_for_temporary_session(temporary_session:, url:)
         end
-        @registered_url = RegisteredUrls::Creator.new.create_for_user(user: current_user, url:) unless token.nil?
+        @registered_url = creator.create_for_user(user: current_user, url:) unless token.nil?
       rescue StandardError => e
         render json: { errors: e.message }, status: :unprocessable_entity
       end
 
       def destroy
-        @registered_url = temporary_session.registered_urls.find_by(uuid: params[:id])
-        return render json: { errors: 'registered url not found' }, status: :not_found unless @registered_url
+        uuid = params[:id]
+        disabler = RegisteredUrls::Disabler.new
 
-        @registered_url.active = false
-        @registered_url.expires_at = Time.zone.now
-
-        unless @registered_url.valid?
-          return render json: { errors: @registered_url.errors }, status: :unprocessable_entity
+        unless temporary_session_token.nil?
+          @registered_url = disabler.disable_for_temporary_session(temporary_session:, uuid:)
         end
-
-        @registered_url.save!
+        @registered_url = disabler.disable_for_user(user: current_user, uuid:) unless token.nil?
+      rescue StandardError => e
+        render json: { errors: e.message }, status: :unprocessable_entity
       end
 
       private

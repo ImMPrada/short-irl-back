@@ -12,9 +12,12 @@ class Users::SessionsController < Devise::SessionsController
   # end
 
   # POST /resource/sign_in
-  # def create
-  #   super
-  # end
+  def create
+    super
+
+    temporary_session_uuid = extract_temporary_session_token
+    RegisteredUrls::Transferor.new.transfer_to_user(user: current_user, temporary_session_uuid:)
+  end
 
   # DELETE /resource/sign_out
   # def destroy
@@ -74,6 +77,16 @@ class Users::SessionsController < Devise::SessionsController
       message: "Couldn't find an active session."
     }, status: :unauthorized
   end
+
+  def extract_temporary_session_token
+    return unless request.headers['Authorization']
+
+    splited_authotization_header = request.headers['Authorization'].split('Token ')
+    return if splited_authotization_header.size == 1
+
+    splited_authotization_header.last
+  end
+
   # protected
 
   # If you have extra params to permit, append them to the sanitizer.

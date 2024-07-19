@@ -88,16 +88,19 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # The path used after sign up.
   def after_sign_up_path_for(resource)
     super(resource)
+    temporary_session_uuid = extract_temporary_session_token
+    return unless temporary_session_uuid
 
-    temporary_session_token = request.headers['Authorization']&.split(' ')&.last
-    return unless temporary_session_token
+    RegisteredUrls::Transferor.new.transfer_to_user(user: resource, temporary_session_uuid:)
+  end
 
-    temporary_session = TemporarySession.find_by(uuid: temporary_session_token)
-    registered_urls = temporary_session.registered_urls
-    resource.registered_urls = registered_urls
+  def extract_temporary_session_token
+    return unless request.headers['Authorization']
 
-    resource.save
-    temporary_session.destroy
+    splited_authotization_header = request.headers['Authorization'].split('Token ')
+    return if splited_authotization_header.size == 1
+
+    splited_authotization_header.last
   end
 
   # The path used after sign up for inactive accounts.
