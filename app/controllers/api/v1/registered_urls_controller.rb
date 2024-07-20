@@ -5,8 +5,16 @@ module Api
 
       def index
         @registered_urls = []
-        @registered_urls = temporary_session.registered_urls.active.not_expired unless temporary_session.nil?
-        @registered_urls = current_user.registered_urls.active.not_expired unless current_user.nil?
+        unless temporary_session.nil?
+          @registered_urls = temporary_session.registered_urls.active.not_expired
+          return render :index, status: :ok
+        end
+        unless current_user.nil?
+          @registered_urls = current_user.registered_urls.active.not_expired
+          return render :index, status: :ok
+        end
+
+        render json: { errors: 'autorizacion fallida' }, status: :unprocessable_entity
       end
 
       def show
@@ -26,6 +34,8 @@ module Api
           @registered_url = creator.create_for_temporary_session(temporary_session:, url:)
         end
         @registered_url = creator.create_for_user(user: current_user, url:) unless token.nil?
+
+        render :create, status: :created
       rescue StandardError => e
         render json: { errors: e.message }, status: :unprocessable_entity
       end
