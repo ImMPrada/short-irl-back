@@ -6,6 +6,7 @@ class Users::SessionsController < Devise::SessionsController
 
   respond_to :json
 
+  LOGGED_IN_MESSAGE = 'Logged in successfully.'
   LOGGED_OUT_MESSAGE = 'Logged out successfully.'
   FAILEED_LOGG_OUT_MESSAGE = "Couldn't find an active session."
 
@@ -29,11 +30,9 @@ class Users::SessionsController < Devise::SessionsController
 
   private
 
-  def respond_with(current_user, _opts = {})
-    return build_failed_response unless current_user.persisted?
-
+  def respond_with(_current_user, _opts = {})
     token = request.env['warden-jwt_auth.token']
-    build_success_response(token)
+    build_success_response(token, LOGGED_IN_MESSAGE)
   end
 
   def respond_to_on_destroy
