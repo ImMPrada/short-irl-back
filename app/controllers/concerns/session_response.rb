@@ -6,13 +6,10 @@ module SessionResponse
 
   def build_success_response(token, message)
     create_cookie(token)
-    response = {
-      message:,
-      data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
-    }
-    response[:data][:token] = cookies[:shorter] unless Rails.env.production?
+    @message = message
+    @user = current_user
 
-    render json: response, status: :ok
+    render :create, status: :ok
   end
 
   def build_failed_response(message, current_user = null)

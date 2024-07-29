@@ -37,7 +37,7 @@ RSpec.describe 'user login', type: :request do
       it 'returns the user data' do
         post '/login', headers:, params: user_params.to_json
 
-        expect(JSON.parse(response.body)['data']['user']).to include('email', 'username')
+        expect(JSON.parse(response.body)['user']).to include('email', 'username')
       end
     end
 
