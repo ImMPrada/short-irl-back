@@ -19,7 +19,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_01_163208) do
     t.string "url", null: false
     t.boolean "active", null: false
     t.string "expires_at", null: false
-    t.bigint "temporary_session_id", null: false
+    t.bigint "temporary_session_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "url_visits_count"
