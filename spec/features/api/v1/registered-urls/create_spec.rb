@@ -96,4 +96,44 @@ RSpec.describe 'API Endpoints', type: :request do
       end
     end
   end
+
+  context 'when the request is by a registered user' do
+    let(:user) { create(:user) }
+    let(:headers) do
+      {
+        'Authorization' => "Bearer a_jwt_token_for_user_#{user.id}",
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json'
+      }
+    end
+    before do
+      allow_any_instance_of(Api::V1::RegisteredUrlsController).to receive(:current_user).and_return(user)
+    end
+
+    describe 'POST /api/v1/registered-urls' do
+      let(:valid_params) do
+        {
+          registered_url: {
+            url: Faker::Internet.url
+          }
+        }.to_json
+      end
+
+      it 'returns ok status' do
+        post('/api/v1/registered-urls', headers:, params: valid_params)
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'returns a message' do
+        post('/api/v1/registered-urls', headers:, params: valid_params)
+        expect(JSON.parse(response.body)).to include('message')
+      end
+
+      it 'returns the created registered URL' do
+        post('/api/v1/registered-urls', headers:, params: valid_params)
+
+        expect(JSON.parse(response.body)['registeredUrl']['url']).to eq(JSON.parse(valid_params)['registered_url']['url'])
+      end
+    end
+  end
 end

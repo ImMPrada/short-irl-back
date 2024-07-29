@@ -51,7 +51,7 @@ RSpec.describe 'API Endpoints', type: :request do
       describe 'when temporary session is not found' do
         let(:headers) do
           {
-            'Authorization' => 'Token not_a_valid_token',
+                  'Authorization' => 'Token not_a_valid_token',
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
           }
@@ -65,6 +65,45 @@ RSpec.describe 'API Endpoints', type: :request do
         it 'returns an error message' do
           get('/api/v1/registered-urls', headers:)
           expect(JSON.parse(response.body)['errors']).to eq('autorizacion fallida')
+        end
+      end
+    end
+  end
+
+  context 'when the request is by a registered user' do
+    let(:user) { create(:user) }
+    let(:headers) do
+      {
+        'Authorization' => "Bearer a_jwt_token_for_user_#{user.id}",
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json'
+      }
+    end
+    before do
+      allow_any_instance_of(Api::V1::RegisteredUrlsController).to receive(:current_user).and_return(user)
+    end
+
+    describe 'GET /api/v1/registered-urls' do
+      it 'returns ok status' do
+        get('/api/v1/registered-urls', headers:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      describe 'when there are registered URLs' do
+        before do
+          5.times { user.registered_urls.create(url: Faker::Internet.url) }
+        end
+
+        it 'returns a list of registered URLs' do
+          get('/api/v1/registered-urls', headers:)
+          expect(JSON.parse(response.body).size).to eq(5)
+        end
+      end
+
+      describe 'when there are no registered URLs' do
+        it 'returns a list of registered URLs' do
+          get('/api/v1/registered-urls', headers:)
+          expect(JSON.parse(response.body).size).to eq(0)
         end
       end
     end
