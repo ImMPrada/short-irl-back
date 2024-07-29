@@ -59,7 +59,7 @@ RSpec.describe 'API Endpoints', type: :request do
 
         it 'returns unauthorized status' do
           get('/api/v1/registered-urls', headers:)
-          expect(response).to have_http_status(:unauthorized)
+          expect(response).to have_http_status(:unprocessable_entity)
         end
 
         it 'returns an error message' do

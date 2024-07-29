@@ -2,9 +2,12 @@
 
 class Users::SessionsController < Devise::SessionsController
   # before_action :configure_sign_in_params, only: [:create]
-  include ActionController::Cookies
+  include SessionResponse
 
   respond_to :json
+
+  LOGGED_OUT_MESSAGE = 'Logged out successfully.'
+  FAILEED_LOGG_OUT_MESSAGE = "Couldn't find an active session."
 
   # GET /resource/sign_in
   # def new
@@ -33,17 +36,6 @@ class Users::SessionsController < Devise::SessionsController
     build_success_response(token)
   end
 
-  def build_success_response(token)
-    create_cookie(token)
-
-    render json: {
-      status: {
-        code: 200, message: 'Logged in successfully.',
-        data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
-      }
-    }, status: :ok
-  end
-
   def respond_to_on_destroy
     if request.headers['Authorization'].present?
       token = request.headers['Authorization'].split(' ').last
@@ -55,27 +47,10 @@ class Users::SessionsController < Devise::SessionsController
     build_on_destroy_response(current_user)
   end
 
-  def create_cookie(token)
-    cookies[:shorter] = {
-      value: token,
-      httponly: true,
-      secure: true,
-      same_site: true
-    }
-  end
-
   def build_on_destroy_response(current_user)
-    if current_user
-      return render json: {
-        status: 200,
-        message: 'Logged out successfully.'
-      }, status: :ok
-    end
+    return render json: { message: LOGGED_OUT_MESSAGE }, status: :ok if current_user
 
-    render json: {
-      status: 401,
-      message: "Couldn't find an active session."
-    }, status: :unauthorized
+    render json: { message: FAILEED_LOGG_OUT_MESSAGE }, status: :unauthorized
   end
 
   def extract_temporary_session_token

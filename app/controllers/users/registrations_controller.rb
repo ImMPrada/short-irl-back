@@ -5,7 +5,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
   before_action :configure_account_update_params, only: [:update]
 
   include RackSessionsFix
-  include ActionController::Cookies
+  include SessionResponse
+
+  SUCCESSFULL_SIGN_UP_MESSAGE = 'Signed up successfully.'
+  FAILED_SIGN_UP_MESSAGE = "User couldn't be created."
 
   respond_to :json
 
@@ -46,33 +49,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
   private
 
   def respond_with(current_user, _opts = {})
-    return build_failed_response unless current_user.persisted?
+    return build_failed_response(FAILED_SIGN_UP_MESSAGE, current_user) unless current_user.persisted?
 
     token = request.env['warden-jwt_auth.token']
-    build_success_response(token)
-  end
-
-  def build_success_response(token)
-    cookies[:shorter] = {
-      value: token,
-      httponly: true,
-      secure: true,
-      same_site: true
-    }
-
-    render json: {
-      status: { code: 200, message: 'Signed up successfully.' },
-      data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
-    }
-  end
-
-  def build_failed_response
-    render json: {
-      status: {
-        message: "User couldn't be created.",
-        errors: current_user ? current_user.errors : 'Unauthorized'
-      }
-    }, status: :unprocessable_entity
+    build_success_response(token, SUCCESSFULL_SIGN_UP_MESSAGE)
   end
 
   # protected
