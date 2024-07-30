@@ -20,11 +20,12 @@ module SessionResponse
   end
 
   def create_cookie(token)
-    cookies[:shorter] = {
+    cookies[:shortener] = {
       value: token,
       httponly: true,
       secure: true,
-      same_site: true
+      same_site: :strict,
+      expires: 1.week.from_now
     }
   end
 end

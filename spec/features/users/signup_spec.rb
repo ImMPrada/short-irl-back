@@ -17,7 +17,8 @@ RSpec.describe 'user signup', type: :request do
         user: {
           email: user_mail,
           password: user_password,
-          username: user_username
+          username: user_username,
+          confirm_password: user_password
         }
       }
     end

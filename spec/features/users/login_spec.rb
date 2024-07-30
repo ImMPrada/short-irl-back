@@ -22,10 +22,20 @@ RSpec.describe 'user login', type: :request do
         }
       }
     end
+    let(:post_user_params) do
+      {
+        user: {
+          email: user_mail,
+          password: user_password,
+          username: user_username,
+          confirm_password: user_password
+        }
+      }
+    end
 
     describe 'when the user is successfully loggedin' do
       before do
-        post '/signup', headers:, params: user_params.to_json
+        post '/signup', headers:, params: post_user_params.to_json
       end
 
       it 'returns a 200 status code' do

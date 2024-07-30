@@ -7,14 +7,13 @@ module Api
 
       def authenticate_request
         return if request.headers['Authorization'].present?
+        return if request.cookies['shortener'].present?
 
         render json: { error: 'Unauthorized' }, status: :unauthorized
       end
 
       def token
-        return unless bearer_token?
-
-        @token ||= request.headers['Authorization'].split('Bearer ')&.last
+        @token ||= request.cookies['shortener']
       end
 
       def current_user
@@ -37,11 +36,9 @@ module Api
       end
 
       def temporary_session_token?
-        request.headers['Authorization'].split('Token ').size > 1
-      end
+        return unless request.headers['Authorization'].present?
 
-      def bearer_token?
-        request.headers['Authorization'].split('Bearer ').size > 1
+        request.headers['Authorization'].split('Token ').size > 1
       end
     end
   end
