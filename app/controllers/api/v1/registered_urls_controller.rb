@@ -5,16 +5,10 @@ module Api
 
       def index
         @registered_urls = []
-        unless temporary_session.nil?
-          @registered_urls = temporary_session.registered_urls.active.not_expired
-          return render :index, status: :ok
-        end
-        unless current_user.nil?
-          @registered_urls = current_user.registered_urls.active.not_expired
-          return render :index, status: :ok
-        end
+        @registered_urls = temporary_session.registered_urls.active.not_expired if temporary_session
+        @registered_urls = current_user.registered_urls.active.not_expired if current_user
 
-        render json: { errors: 'autorizacion fallida' }, status: :unprocessable_entity
+        render :index, status: :ok
       end
 
       def show
@@ -27,14 +21,15 @@ module Api
       end
 
       def create
-        url = registered_url_params[:url]
         creator = RegisteredUrls::Creator.new
 
         unless temporary_session_token.nil?
           @registered_url = creator.create_for_temporary_session(temporary_session:, url:)
+          return render :create, status: :created
         end
-        @registered_url = creator.create_for_user(user: current_user, url:) unless token.nil?
+        return build_unauthorized_response unless current_user
 
+        @registered_url = creator.create_for_user(user: current_user, url:)
         render :create, status: :created
       rescue StandardError => e
         render json: { errors: e.message }, status: :unprocessable_entity
@@ -53,6 +48,10 @@ module Api
       end
 
       private
+
+      def url
+        @url ||= registered_url_params[:url]
+      end
 
       def registered_url_params
         params.require(:registered_url).permit(:url)

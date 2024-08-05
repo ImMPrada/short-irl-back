@@ -36,9 +36,9 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def respond_to_on_destroy
-    if request.headers['Authorization'].present?
-      token = request.headers['Authorization'].split(' ').last
+    token = request.cookies['shortener']
 
+    if token
       jwt_payload = Warden::JWTAuth::TokenDecoder.new.call(token)
       current_user = User.find(jwt_payload['sub'])
     end
@@ -47,9 +47,10 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def build_on_destroy_response(current_user)
-    return render json: { message: LOGGED_OUT_MESSAGE }, status: :ok if current_user
+    return render json: { message: FAILEED_LOGG_OUT_MESSAGE }, status: :unauthorized unless current_user
 
-    render json: { message: FAILEED_LOGG_OUT_MESSAGE }, status: :unauthorized
+    destroy_cookie
+    render json: { message: LOGGED_OUT_MESSAGE }, status: :ok
   end
 
   def extract_temporary_session_token

@@ -21,6 +21,8 @@ module Api
 
         jwt_payload = Warden::JWTAuth::TokenDecoder.new.call(token)
         @current_user ||= User.find(jwt_payload['sub'])
+      rescue JWT::ExpiredSignature
+        nil
       end
 
       def temporary_session_token

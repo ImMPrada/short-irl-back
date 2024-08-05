@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       post 'temporary-session' => 'temporary_session#create'
       resources :registered_urls, path: 'registered-urls', only: %i[create index show destroy]
+      resource :current_user, only: :show
     end
   end
 

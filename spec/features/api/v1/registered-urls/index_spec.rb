@@ -51,20 +51,20 @@ RSpec.describe 'API Endpoints', type: :request do
       describe 'when temporary session is not found' do
         let(:headers) do
           {
-                  'Authorization' => 'Token not_a_valid_token',
+            'Authorization' => 'Token not_a_valid_token',
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
           }
         end
 
-        it 'returns unauthorized status' do
+        it 'returns ok status' do
           get('/api/v1/registered-urls', headers:)
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:ok)
         end
 
-        it 'returns an error message' do
+        it 'returns an empty list' do
           get('/api/v1/registered-urls', headers:)
-          expect(JSON.parse(response.body)['errors']).to eq('autorizacion fallida')
+          expect(JSON.parse(response.body)).to be_empty
         end
       end
     end
