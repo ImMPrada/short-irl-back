@@ -39,6 +39,7 @@ RSpec.describe RegisteredUrl, type: :model do
   end
 
   describe 'associations' do
+    it { is_expected.to belong_to(:user).optional }
     it { is_expected.to belong_to(:temporary_session).optional }
     it { is_expected.to have_many(:url_visits).dependent(:destroy) }
   end

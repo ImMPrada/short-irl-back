@@ -1,4 +1,15 @@
 Rails.application.routes.draw do
+  devise_for :users,
+             path: '',
+             path_names: {
+               sign_in: 'login',
+               sign_out: 'logout',
+               registration: 'signup'
+             },
+             controllers: {
+               sessions: 'users/sessions',
+               registrations: 'users/registrations'
+             }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -8,7 +19,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       post 'temporary-session' => 'temporary_session#create'
-      resources :registered_urls, path: 'registered-urls', only: %i[create index destroy]
+      resources :registered_urls, path: 'registered-urls', only: %i[create index show destroy]
+      resource :current_user, only: :show
     end
   end
 
