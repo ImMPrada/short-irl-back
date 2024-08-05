@@ -10,6 +10,12 @@ require 'rspec/rails'
 require 'support/shoulda_matchers'
 require 'support/factory_bot'
 
+require 'capybara/rails'
+require 'capybara/rspec'
+
+Capybara.server = :puma, { Silent: true } # To silence the Puma server output
+Capybara.javascript_driver = :selenium_chrome_headless # or :selenium_chrome
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end

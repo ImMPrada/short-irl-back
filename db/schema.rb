@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_01_163208) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_02_150719) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -23,7 +23,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_01_163208) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "url_visits_count"
+    t.bigint "user_id"
     t.index ["temporary_session_id"], name: "index_registered_urls_on_temporary_session_id"
+    t.index ["user_id"], name: "index_registered_urls_on_user_id"
     t.index ["uuid"], name: "index_registered_urls_on_uuid", unique: true
   end
 
@@ -41,6 +43,23 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_01_163208) do
     t.index ["registered_url_id"], name: "index_url_visits_on_registered_url_id"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "encrypted_password", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "username"
+    t.string "jti"
+    t.string "confirm_password", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["jti"], name: "index_users_on_jti"
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
   add_foreign_key "registered_urls", "temporary_sessions"
+  add_foreign_key "registered_urls", "users"
   add_foreign_key "url_visits", "registered_urls"
 end
