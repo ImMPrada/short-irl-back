@@ -13,17 +13,17 @@ services:
     preDeployCommand: "bundle exec rails db:migrate" # preDeployCommand only available on paid instance types
     startCommand: "bundle exec rails server"
     envVars:
-      - key: RAILS_ENV
-        sync: false
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: mysite
+          property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
+      - key: WEB_CONCURRENCY
+        value: 2 # sensible default
       - key: DEVISE_JWT_SECRET_KEY
         sync: false
       - key: CORS_ORIGIN
         sync: false
       - key: PORT
         sync: false
-      - key: WEB_CONCURRENCY
-        value: 2 # sensible default
