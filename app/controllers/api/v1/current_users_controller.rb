@@ -15,7 +15,7 @@ module Api
 
       def destroy_session
         destroy_cookie
-        ender json: { error: 'Unauthorized' }, status: :unauthorized
+        render json: { error: 'Unauthorized' }, status: :unauthorized
       end
     end
   end
