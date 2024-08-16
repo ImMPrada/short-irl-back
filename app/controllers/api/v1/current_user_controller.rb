@@ -1,11 +1,11 @@
 module Api
   module V1
-    class CurrentUsersController < ProtectedApplicationController
+    class CurrentUserController < ProtectedApplicationController
       before_action :authenticate_request
 
     include SessionResponse
 
-      def show
+      def resolve_user
         return destroy_session unless current_user
 
         @user = current_user
