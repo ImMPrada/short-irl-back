@@ -15,5 +15,8 @@ class TemporarySession < ApplicationRecord
 
   def generate_uuid
     self.uuid = SecureRandom.uuid if uuid.blank?
+  rescue StandardError => e
+    Rails.logger.error("Error generating UUID: #{e.message}")
+    raise
   end
 end
