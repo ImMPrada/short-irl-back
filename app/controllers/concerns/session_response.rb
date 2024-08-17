@@ -29,7 +29,7 @@ module SessionResponse
       value: token,
       httponly: true,
       secure: true,
-      same_site: :strict,
+      same_site: :none,
       expires: 1.month.from_now.utc
     }
   end
