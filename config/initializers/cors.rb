@@ -10,7 +10,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     if Rails.env.development? || Rails.env.test?
       origins 'http://localhost:5173'
     else
-      origins 'https://short-url-front-git-main-miguel-pradas-projects.vercel.app'
+      origins 'https://short-url-front-lac.vercel.app/'
     end
 
     resource '*',
