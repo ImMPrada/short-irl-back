@@ -358,7 +358,6 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
-    uuidtools (2.2.0)
     warden (1.2.9)
       rack (>= 2.0.9)
     warden-jwt_auth (0.10.0)
@@ -415,7 +414,6 @@ DEPENDENCIES
   shoulda-matchers (~> 5.0)
   simplecov
   tzinfo-data
-  uuidtools
 
 RUBY VERSION
    ruby 3.3.0p0
