@@ -12,10 +12,10 @@ module SessionResponse
     render :create, status: :ok
   end
 
-  def build_failed_response(message, current_user = null)
+  def build_failed_response(message, errors = null)
     render json: {
       message:,
-      errors: current_user ? current_user.errors : 'Unauthorized'
+      errors: errors || 'Unauthorized'
     }, status: :unprocessable_entity
   end
 

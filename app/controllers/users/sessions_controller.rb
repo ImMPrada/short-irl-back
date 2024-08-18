@@ -8,6 +8,7 @@ class Users::SessionsController < Devise::SessionsController
 
   LOGGED_IN_MESSAGE = 'Logged in successfully.'
   LOGGED_OUT_MESSAGE = 'Logged out successfully.'
+  FAILED_SIGN_IN_MESSAGE = "Couldn't create session."
   FAILEED_LOGG_OUT_MESSAGE = "Couldn't find an active session."
 
   # GET /resource/sign_in
@@ -17,9 +18,12 @@ class Users::SessionsController < Devise::SessionsController
 
   # POST /resource/sign_in
   def create
-    super
+    return unprocessable_entity_response if email.blank? || password.blank?
 
+    super
     temporary_session_uuid = extract_temporary_session_token
+    return unless temporary_session_uuid
+
     RegisteredUrls::Transferor.new.transfer_to_user(user: current_user, temporary_session_uuid:)
   end
 
@@ -62,7 +66,24 @@ class Users::SessionsController < Devise::SessionsController
     splited_authotization_header.last
   end
 
-  # protected
+  def unprocessable_entity_response
+    errors = {}
+
+    errors[:email] = ["can't be blank"] if email.blank?
+    errors[:password] = ["can't be blank"] if password.blank?
+
+    build_failed_response(FAILED_SIGN_IN_MESSAGE, errors)
+  end
+
+  protected
+
+  def email
+    params[:user][:email]
+  end
+
+  def password
+    params[:user][:password]
+  end
 
   # If you have extra params to permit, append them to the sanitizer.
   # def configure_sign_in_params

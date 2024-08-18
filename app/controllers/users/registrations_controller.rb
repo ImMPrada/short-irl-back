@@ -49,7 +49,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   private
 
   def respond_with(current_user, _opts = {})
-    return build_failed_response(FAILED_SIGN_UP_MESSAGE, current_user) unless current_user.persisted?
+    return build_failed_response(FAILED_SIGN_UP_MESSAGE, current_user.errors) unless current_user.persisted?
 
     token = request.env['warden-jwt_auth.token']
     build_success_response(token, SUCCESSFULL_SIGN_UP_MESSAGE)
